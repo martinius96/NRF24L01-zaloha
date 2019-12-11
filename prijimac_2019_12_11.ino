@@ -1,20 +1,21 @@
 // nRF24L01 prijimac
-#include <SPI.h> //arduino kniznica pre SPI zbernicu
-#include "RF24.h" //kniznica pre moduly
-int odozva = 1; //globalna premenna pre odosielany stav
-int prijem = 0; //globalna premenna pre citany stav
-#define CE 4 //chip state pin
-#define CS 3 //chip select pin
-RF24 nRF(CE, CS); //nrf s volitelnymi pinmi CE a CS
+#include <SPI.h>
+#include "RF24.h"
+int odozva = 1;
+int prijem = 0;
+#define CE 4
+#define CS 3
+RF24 nRF(CE, CS);
 byte adresaPrijimac[] = "prijimac00"; //adresa prijimac
 byte adresaVysielac[] = "vysielac00"; //adresa vysielac
+
 void setup() {
-  Serial.begin(9600); //Serial monitor na 9600 baud/s
-  nRF.begin(); //zapnut komunikaciu s nRF modulom
+  Serial.begin(9600);
+  nRF.begin();
   nRF.setDataRate( RF24_250KBPS );
   nRF.setPALevel(RF24_PA_HIGH);
-  nRF.openWritingPipe(adresaPrijimac); //zapisujeme na prijimac na jeho adresu
-  nRF.openReadingPipe(1, adresaVysielac); //citame na svojej adrese na kanale XX
+  nRF.openWritingPipe(adresaPrijimac);
+  nRF.openReadingPipe(1, adresaVysielac);
   nRF.startListening();
 }
 
@@ -30,5 +31,19 @@ void loop() {
     nRF.stopListening();
     nRF.write( &odozva, sizeof(odozva) );
     nRF.startListening();
+    switch (prijem) {
+      case 0:
+        //PRE HODNOTU STATE 0
+        Serial.println("ZAPNEM RELE");
+        break;
+      case 1:
+        //PRE HODNOTU STATE 1
+        Serial.println("VYPINAM RELE");
+        break;
+      default:
+        //PRE HODNOTU STATE 2 alebo inu
+        Serial.print("HODNOTA Z ROZSAHU 2-10 --> nepridelena akcia");
+        break;
+    }
   }
 }
