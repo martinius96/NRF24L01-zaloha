@@ -4,7 +4,7 @@
 #define CE 4
 #define CS 3
 RF24 nRF(CE, CS);
-int odezva = 1;
+int odozva = 1;
 int prijem = 0;
 byte adresaPrijimac[] = "prijimac00";
 byte adresaVysielac[] = "vysielac00";
@@ -20,8 +20,11 @@ void setup() {
 }
 
 void loop() {
+  if (odozva >= 10) {
+    odozva = 0;
+  }
   nRF.stopListening();
-  nRF.write( &odezva, sizeof(odezva) );
+  nRF.write( &odozva, sizeof(odozva) );
   nRF.startListening();
   while (nRF.available()) {
     nRF.read( &prijem, sizeof(prijem) );
@@ -29,6 +32,7 @@ void loop() {
   Serial.println("Prijate data: ");
   Serial.println(prijem);
   Serial.println("Odozva: ");
-  Serial.println(odezva);
+  Serial.println(odozva);
   delay(50);
+  odozva++;
 }
